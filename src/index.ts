@@ -1,12 +1,8 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  Tool,
-} from "@modelcontextprotocol/sdk/types.js";
+import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
+import { Server } from "@modelcontextprotocol/server";
+import type { Tool } from "@modelcontextprotocol/server";
 import { ThoughtType, ShannonThoughtData } from "./types.js";
 import { ShannonThinkingServer } from "./server.js";
 
@@ -207,7 +203,7 @@ Each thought can build on, revise, or re-examine previous steps, creating a flex
 const server = new Server(
   {
     name: "shannon-thinking-server",
-    version: "0.1.0",
+    version: "0.2.0",
   },
   {
     capabilities: {
@@ -218,11 +214,11 @@ const server = new Server(
 
 const thinkingServer = new ShannonThinkingServer();
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
+server.setRequestHandler('tools/list', async () => ({
   tools: [SHANNON_THINKING_TOOL],
 }));
 
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+server.setRequestHandler('tools/call', async (request) => {
   if (request.params.name === "shannonthinking") {
     return thinkingServer.processThought(request.params.arguments);
   }
